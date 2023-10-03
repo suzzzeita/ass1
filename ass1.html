@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculator</title>
+    <style>
+        /* Calculator Styles */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        #calculator {
+            width: 300px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+            background-color: white;
+        }
+
+        #display {
+            text-align: right;
+            padding: 10px;
+            font-size: 24px;
+            border-bottom: 1px solid #ccc;
+        }
+
+        #buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 5px;
+            padding: 10px;
+        }
+
+        .button {
+            padding: 15px;
+            font-size: 20px;
+            text-align: center;
+            cursor: pointer;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .button:hover {
+            background-color: #eee;
+        }
+    </style>
+</head>
+<body>
+    <div id="calculator">
+        <div id="display">0</div>
+        <div id="buttons">
+            <div class="button" onclick="clearDisplay()">C</div>
+            <div class="button" onclick="toggleSign()">+/-</div>
+            <div class="button" onclick="appendDigit('7')">7</div>
+            <div class="button" onclick="appendDigit('8')">8</div>
+            <div class="button" onclick="appendDigit('9')">9</div>
+            <div class="button" onclick="setOperator('+')">+</div>
+            <div class="button" onclick="appendDigit('4')">4</div>
+            <div class="button" onclick="appendDigit('5')">5</div>
+            <div class="button" onclick="appendDigit('6')">6</div>
+            <div class="button" onclick="setOperator('-')">-</div>
+            <div class="button" onclick="appendDigit('1')">1</div>
+            <div class="button" onclick="appendDigit('2')">2</div>
+            <div class="button" onclick="appendDigit('3')">3</div>
+            <div class="button" onclick="setOperator('*')">*</div>
+            <div class="button" onclick="appendDigit('0')">0</div>
+            <div class="button" onclick="appendDecimal('.')">.</div>
+            <div class="button" onclick="calculateResult()">=</div>
+            <div class="button" onclick="setOperator('/')">/</div>
+        </div>
+    </div>
+
+    <script>
+        // Calculator Logic
+        let display = document.getElementById("display");
+        let currentValue = "0";
+        let rememberedValue = null;
+        let rememberedOperator = null;
+        let resultMode = false;
+
+        function updateDisplay() {
+            if (currentValue === "-0") {
+                currentValue = "0";
+            }
+            if (currentValue.length > 12) {
+                currentValue = "Error";
+            }
+            display.textContent = currentValue;
+        }
+
+        function clearDisplay() {
+            currentValue = "0";
+            rememberedValue = null;
+            rememberedOperator = null;
+            resultMode = false;
+            updateDisplay();
+        }
+
+        function toggleSign() {
+            if (resultMode || currentValue === "0") {
+                currentValue = "-0";
+                resultMode = false;
+            } else if (currentValue.charAt(0) === "-") {
+                currentValue = currentValue.slice(1);
+            } else {
+                currentValue = "-" + currentValue;
+            }
+            updateDisplay();
+        }
+
+        function appendDigit(digit) {
+            if (resultMode) {
+                currentValue = "0";
+                resultMode = false;
+            }
+            if (currentValue === "0" || currentValue === "-0") {
+                currentValue = digit;
+            } else if (currentValue.length < 12) {
+                currentValue += digit;
+            }
+            updateDisplay();
+        }
+
+        function appendDecimal() {
+            if (resultMode) {
+                currentValue = "0.";
+                resultMode = false;
+            } else if (currentValue.indexOf(".") === -1 && currentValue.length < 11) {
+                currentValue += ".";
+            }
+            updateDisplay();
+        }
+
+        function setOperator(operator) {
+            if (rememberedValue !== null && rememberedOperator !== null) {
+                calculateResult();
+            } else {
+                rememberedValue = currentValue;
+                rememberedOperator = operator;
+                resultMode = true;
+            }
+        }
+
+        function calculateResult() {
+            if (rememberedValue !== null && rememberedOperator !== null) {
+                const num1 = parseFloat(rememberedValue);
+                const num2 = parseFloat(currentValue);
+                let result;
+                switch (rememberedOperator) {
+                    case '+':
+                        result = num1 + num2;
+                        break;
+                    case '-':
+                        result = num1 - num2;
+                        break;
+                    case '*':
+                        result = num1 * num2;
+                        break;
+                    case '/':
+                        if (num2 !== 0) {
+                            result = num1 / num2;
+                        } else {
+                            result = "Error";
+                        }
+                        break;
+                }
+                currentValue = result.toString();
+                if (currentValue.length > 12) {
+                    currentValue = "Error";
+                }
+                rememberedValue = null;
+                rememberedOperator = null;
+                resultMode = true;
+                updateDisplay();
+            }
+        }
+    </script>
+</body>
+</html>
